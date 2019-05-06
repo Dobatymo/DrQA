@@ -15,6 +15,7 @@ import logging
 from termcolor import colored
 from drqa import pipeline
 from drqa.retriever import utils
+from drqa.retriever import ElasticDocRanker
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -65,7 +66,15 @@ DrQA = pipeline.DrQA(
     cuda=args.cuda,
     fixed_candidates=candidates,
     reader_model=args.reader_model,
-    ranker_config={'options': {'tfidf_path': args.retriever_model}},
+    ranker_config={
+        'class': ElasticDocRanker,
+        'options': {
+            'elastic_fields': ['text'],
+            'elastic_field_doc_name': 'title',
+            'elastic_field_content': 'text',
+            'elastic_index': 'wiki-articles'
+        }
+    },
     db_config={'options': {'db_path': args.doc_db}},
     tokenizer=args.tokenizer
 )
